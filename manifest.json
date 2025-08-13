@@ -1,0 +1,21 @@
+{
+  "name": "Altın Sertifikası Fark Hesaplayıcı",
+  "short_name": "Altın Fark",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#000000",
+  "description": "Gram altın ve altın sertifikası fiyatları arasındaki yüzdelik farkı hesaplayın.",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

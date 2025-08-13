@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Altın Sertifikası Fark Hesaplayıcı</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#000000">
+<style>
+  :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+  body { margin: 0; padding: 24px; background: #f7f7f8; }
+  .card { max-width: 560px; margin: 0 auto; background: #fff; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,.06); padding: 20px; }
+  h1 { font-size: 20px; margin: 0 0 12px; }
+  p { color: #444; margin: 0 0 18px; line-height: 1.4; }
+  label { display: block; font-weight: 600; margin: 12px 0 6px; }
+  input[type="number"] { width: 100%; padding: 12px; font-size: 16px; border: 1px solid #ddd; border-radius: 10px; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .mini { font-size: 12px; color: #555; }
+  .output { margin-top: 16px; padding: 14px; border-radius: 12px; background: #f0f6ff; }
+  .kpi { font-weight: 800; font-size: 28px; margin: 4px 0; }
+  .sub { font-size: 13px; color: #333; }
+  .bad { background: #fff3f3; }
+  .good { background: #eefbf1; }
+  .btn { margin-top: 14px; padding: 10px 14px; border: none; border-radius: 10px; background: black; color: white; font-weight: 600; cursor: pointer; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1>Altın Sertifikası Fark Hesaplayıcı</h1>
+    <p>Formül: <code>((Sertifika − (Gram/100)) / (Gram/100)) × 100</code></p>
+    <div class="row">
+      <div>
+        <label for="gram">Gram altın fiyatı (TL)</label>
+        <input id="gram" type="number" inputmode="decimal" step="0.01" placeholder="Örn: 3500" autofocus>
+        <div class="mini">Not: 100'e bölünerek 0,01g karşılığına çevrilir.</div>
+      </div>
+      <div>
+        <label for="sert">Sertifika fiyatı (TL)</label>
+        <input id="sert" type="number" inputmode="decimal" step="0.01" placeholder="Örn: 34.90">
+      </div>
+    </div>
+    <button class="btn" onclick="hesapla()">Hesapla</button>
+    <div id="out" class="output" style="display:none;"></div>
+  </div>
+
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('service-worker.js').then(() => {
+    console.log('Service Worker kayıtlı.');
+  });
+}
+function fmt(n){ return (Math.round(n*100)/100).toLocaleString('tr-TR', {minimumFractionDigits: 2, maximumFractionDigits: 2}); }
+function hesapla(){
+  const g = parseFloat(document.getElementById('gram').value);
+  const s = parseFloat(document.getElementById('sert').value);
+  const out = document.getElementById('out');
+  if(!isFinite(g) || !isFinite(s) || g<=0){
+    out.style.display='block';
+    out.className='output';
+    out.innerHTML = 'Lütfen geçerli iki değer giriniz.';
+    return;
+  }
+  const birim = g/100;
+  const farkYuzde = ((s - birim) / birim) * 100;
+  const premium = s - birim;
+
+  out.style.display='block';
+  out.className = 'output ' + (farkYuzde>=0 ? 'bad' : 'good');
+  out.innerHTML = `
+    <div class="kpi">${farkYuzde.toFixed(2)}%</div>
+    <div class="sub">Sertifika fiyatı, 0,01g karşılığına göre ${farkYuzde>=0 ? 'daha <b>yüksek</b>' : 'daha <b>düşük</b>'}.</div>
+    <div class="sub">0,01g karşılığı: <b>${fmt(birim)} TL</b> &middot; Sertifika: <b>${fmt(s)} TL</b> &middot; Mutlak fark: <b>${fmt(premium)} TL</b></div>
+  `;
+}
+document.addEventListener('keydown', (e) => {
+  if(e.key === 'Enter'){ hesapla(); }
+});
+</script>
+</body>
+</html>
