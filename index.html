@@ -9,7 +9,7 @@
 <style>
   :root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
   body { margin: 0; padding: 24px; background: #f7f7f8; }
-  .card { max-width: 560px; margin: 0 auto; background: #fff; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,.06); padding: 20px; }
+  .card { max-width: 620px; margin: 0 auto; background: #fff; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,.06); padding: 20px; }
   h1 { font-size: 20px; margin: 0 0 12px; }
   p { color: #444; margin: 0 0 18px; line-height: 1.4; }
   label { display: block; font-weight: 600; margin: 12px 0 6px; }
@@ -21,7 +21,10 @@
   .sub { font-size: 13px; color: #333; }
   .bad { background: #fff3f3; }
   .good { background: #eefbf1; }
+  .neutral { background: #f5f5f5; }
   .btn { margin-top: 14px; padding: 10px 14px; border: none; border-radius: 10px; background: black; color: white; font-weight: 600; cursor: pointer; }
+  .rulebox { margin-top: 16px; padding: 12px; border-radius: 12px; background: #fafafa; border: 1px dashed #ddd; }
+  .tag { display: inline-block; padding: 6px 10px; border-radius: 999px; font-weight: 700; font-size: 12px; margin-top: 8px; }
 </style>
 </head>
 <body>
@@ -41,6 +44,16 @@
     </div>
     <button class="btn" onclick="hesapla()">Hesapla</button>
     <div id="out" class="output" style="display:none;"></div>
+
+    <div class="rulebox">
+      <strong>AltınS1 Notu</strong>
+      <ul>
+        <li>%15 <em>pahalı</em> olursa: <b>SAT</b></li>
+        <li>%1 – %5 <em>pahalı</em> olursa: <b>AL</b></li>
+        <li>Daha <em>ucuz</em> olursa: <b>KESİN AL</b></li>
+      </ul>
+      <div id="reco" class="tag" style="display:none;"></div>
+    </div>
   </div>
 
 <script>
@@ -54,13 +67,15 @@ function hesapla(){
   const g = parseFloat(document.getElementById('gram').value);
   const s = parseFloat(document.getElementById('sert').value);
   const out = document.getElementById('out');
+  const reco = document.getElementById('reco');
   if(!isFinite(g) || !isFinite(s) || g<=0){
     out.style.display='block';
     out.className='output';
     out.innerHTML = 'Lütfen geçerli iki değer giriniz.';
+    reco.style.display='none';
     return;
   }
-  const birim = g/100;
+  const birim = g/100; // 0,01g karşılığı
   const farkYuzde = ((s - birim) / birim) * 100;
   const premium = s - birim;
 
@@ -71,6 +86,32 @@ function hesapla(){
     <div class="sub">Sertifika fiyatı, 0,01g karşılığına göre ${farkYuzde>=0 ? 'daha <b>yüksek</b>' : 'daha <b>düşük</b>'}.</div>
     <div class="sub">0,01g karşılığı: <b>${fmt(birim)} TL</b> &middot; Sertifika: <b>${fmt(s)} TL</b> &middot; Mutlak fark: <b>${fmt(premium)} TL</b></div>
   `;
+
+  // Recommendation logic per user's note
+  let recText = '';
+  let recClass = 'neutral';
+  if (farkYuzde >= 15) {
+    recText = 'Öneri: SAT (≥ %15 pahalı)';
+    recClass = 'bad';
+  } else if (farkYuzde > 0 && farkYuzde <= 5) {
+    recText = 'Öneri: AL (%1 – %5 pahalı aralığına yakın)';
+    recClass = 'neutral';
+  } else if (farkYuzde < 0) {
+    recText = 'Öneri: KESİN AL (daha ucuz)';
+    recClass = 'good';
+  } else {
+    // 0 ile 1 arası veya 5-15 arası için nötr mesaj
+    if (farkYuzde > 5 && farkYuzde < 15) {
+      recText = 'Öneri: NÖTR / BEKLE (%5 – %15 pahalı)';
+      recClass = 'neutral';
+    } else {
+      recText = 'Öneri: AL (≈ %0 – %1 pahalı veya eşit)';
+      recClass = 'neutral';
+    }
+  }
+  reco.textContent = recText;
+  reco.className = 'tag ' + recClass;
+  reco.style.display = 'inline-block';
 }
 document.addEventListener('keydown', (e) => {
   if(e.key === 'Enter'){ hesapla(); }

@@ -1,6 +1,6 @@
 self.addEventListener('install', function(e) {
   e.waitUntil(
-    caches.open('altin-fark-cache').then(function(cache) {
+    caches.open('altin-fark-cache-v2').then(function(cache) {
       return cache.addAll([
         './',
         './index.html',
@@ -10,6 +10,11 @@ self.addEventListener('install', function(e) {
         './icons/icon-512.png'
       ]);
     })
+  );
+});
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then((keys) => Promise.all(keys.filter(k => k !== 'altin-fark-cache-v2').map(k => caches.delete(k))))
   );
 });
 self.addEventListener('fetch', function(e) {

@@ -5,17 +5,9 @@
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#000000",
-  "description": "Gram altın ve altın sertifikası fiyatları arasındaki yüzdelik farkı hesaplayın.",
+  "description": "Gram altın ve altın sertifikası fiyatları arasındaki yüzdelik farkı hesaplayın ve AltınS1 notuna göre öneri alın.",
   "icons": [
-    {
-      "src": "icons/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "icons/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    }
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
   ]
 }
